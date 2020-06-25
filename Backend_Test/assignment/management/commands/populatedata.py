@@ -18,26 +18,24 @@ class Command(BaseCommand):
         parser.add_argument(
             'number_of_user_records',
             type=int,
-            help="Number of stock records to generate and save to database"
+            help="Number of user records to generate and save to database"
         )
     def get_timezone(self):
         random_timezone = pytz.all_timezones
         random_timezone = random.choice(random_timezone)
         return random_timezone
 
-    def end_time(self,tz):
-        end = datetime.strptime('2020-09-18 4:50 AM', '%Y-%m-%d %I:%M %p')
-        end = end.astimezone(pytz.timezone(tz))
+    def end_time(self):
+        end = datetime(2020, 6, 30, 7, 1, 8, 475874,tzinfo=pytz.timezone("UTC"))
         return end
 
-    def strt_time(self,tz):
-        now_utc = datetime.now(pytz.timezone('UTC'))
-        start = now_utc.astimezone(pytz.timezone(tz))
+    def strt_time(self):
+        start = datetime.now(tz=pytz.timezone("UTC"))
         return start
 
-    def random_date(self,tz):
-        start = self.strt_time(tz)
-        end = self.end_time(tz)
+    def random_date(self):
+        start = self.strt_time()
+        end = self.end_time()
         delta = end - start
         int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
         random_second = randrange(int_delta)
@@ -60,15 +58,15 @@ class Command(BaseCommand):
             kwargs = {
                 "user_id": dummy_id,
                 "real_name": self.get_name(),
+                "tz": self.get_timezone()
             }
             recordone = User(**kwargs)
-            recordone.save()
-            tz = self.get_timezone()
             gwargs = {
                 "user_id" : recordone,
-                "start_time": self.strt_time(tz),
-                "end_time" : self.random_date(tz),
+                "start_time": self.strt_time(),
+                "end_time" : self.random_date(),
             }
             recordtwo = ActivityPeriod(**gwargs)
+            recordone.save()
             recordtwo.save()
-        self.stdout.write(self.style.SUCCESS('Stock records saved successfully.'))
+        self.stdout.write(self.style.SUCCESS('User records saved successfully.'))
