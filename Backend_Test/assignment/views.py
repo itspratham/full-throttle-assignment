@@ -36,20 +36,13 @@ class UserDataView(views.APIView):
         snippet2 = self.get_activity_object()
         serializer1 = UserSerializer(snippet1,many = True)
         serializer2 = ActivityPeriodSerializer(snippet2,many= True)
-        set1={}
         for i in range(len(serializer1.data)):
-            list_to_be_appended = {"start_time": self.get_date(serializer2.data[i]["start_time"]),
-                                   "end_time": self.get_date(serializer2.data[i]["end_time"])
-                                   }
-            if serializer1.data[i]["user_id"] in User.objects.all():
-                set1[serializer1.data[i]["user_id"]].append(list_to_be_appended)
-            else:
-                set1[serializer1.data[i]["user_id"]] =[]
-                set1[serializer1.data[i]["user_id"]].append(list_to_be_appended)
             list1.append({"id":serializer1.data[i]["user_id"],
                           "real_name":serializer1.data[i]["real_name"],
                           "tz": serializer1.data[i]["tz"],
-                           "activity_periods":set1[serializer1.data[i]["user_id"]],
+                           "activity_periods":[{"start_time": self.get_date(serializer2.data[i]["start_time"]),
+                                   "end_time": self.get_date(serializer2.data[i]["end_time"])
+                                   }],
                           })
         data["members"] = list1
         return Response(data=data,status=status.HTTP_200_OK)
