@@ -25,7 +25,11 @@ SECRET_KEY = 'ls5s$=-kj5t%t)wm8^0%fv#c0+sc%cf17x%28dp4%r01gd#j6!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ["itspratham.pythonanywhere.com']
+=======
+ALLOWED_HOSTS = ["itspratham.pythonanywhere.com"]
+>>>>>>> c1ed857ecbfbac34acb1597fd8824367d19f7b0f
 
 
 # Application definition
