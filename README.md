@@ -1,7 +1,7 @@
 # full-throttle-assignment
 1: git clone https://github.com/itspratham/full-throttle-assignment.git
 2: cd Backend_Test
-3: python manage.py -r requirements.txt
+3: pip install -r requirements.txt
 
 # To populate the data
 4: python manage.py populatedata <int:size of the population>   (python manage.py populatedata 10)
