@@ -47,7 +47,7 @@ class UserDataView(views.APIView):
                           "tz": serializer1.data["tz"],
                            "activity_periods": [{"start_time": self.get_date(serializer2.data[j]["start_time"]),
                                    "end_time": self.get_date(serializer2.data[j]["end_time"])
-                                   } for j in range(1, len(snippet2))]
+                                   } for j in range(0, len(snippet2))]
                           })
         data["members"] = list1
         return Response(data=data,status=status.HTTP_200_OK)
