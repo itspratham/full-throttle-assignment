@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 
 from rest_framework import views
-from .serializers import UserSerializer,ActivityPeriodSerializer
+from .serializers import ActivityPeriodSerializer, UserSerializer
 from .models import User,ActivityPeriod
 from django.http import Http404
 from rest_framework.response import Response
@@ -18,11 +18,15 @@ class UserDataView(views.APIView):
         date = parser.isoparse(date_serial)
         return datetime.strftime(date,'%B %d %Y %I:%M%p')
 
-    def get_user_object(self):
+    def get_user_object(self, pk):
         try:
-            return User.objects.all()
+            return User.objects.get(pk=pk)
         except User.DoesNotExist:
             raise Http404
+
+    def get_user_length(self):
+        return len(User.objects.all())
+
     def get_activity_object(self):
         try:
             return ActivityPeriod.objects.all()
@@ -31,18 +35,19 @@ class UserDataView(views.APIView):
 
     def get(self, request):
         data = {"ok": "true",}
+        print(self.get_user_length())
         list1 = []
-        snippet1 = self.get_user_object()
-        snippet2 = self.get_activity_object()
-        serializer1 = UserSerializer(snippet1,many = True)
-        serializer2 = ActivityPeriodSerializer(snippet2,many= True)
-        for i in range(len(serializer1.data)):
-            list1.append({"id":serializer1.data[i]["user_id"],
-                          "real_name":serializer1.data[i]["real_name"],
-                          "tz": serializer1.data[i]["tz"],
-                           "activity_periods":[{"start_time": self.get_date(serializer2.data[i]["start_time"]),
-                                   "end_time": self.get_date(serializer2.data[i]["end_time"])
-                                   }],
+        for i in range(1,self.get_user_length()+1):
+            snippet1 = self.get_user_object(i)
+            serializer1 = UserSerializer(snippet1)
+            snippet2  = ActivityPeriod.objects.filter(user_id = i)
+            serializer2 = ActivityPeriodSerializer(snippet2, many=True)
+            list1.append({"id":serializer1.data["user_id"],
+                          "real_name":serializer1.data["real_name"],
+                          "tz": serializer1.data["tz"],
+                           "activity_periods": [{"start_time": self.get_date(serializer2.data[j]["start_time"]),
+                                   "end_time": self.get_date(serializer2.data[j]["end_time"])
+                                   } for j in range(1, len(snippet2))]
                           })
         data["members"] = list1
         return Response(data=data,status=status.HTTP_200_OK)

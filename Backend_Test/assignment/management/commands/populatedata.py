@@ -7,11 +7,14 @@ from assignment.models import User, ActivityPeriod
 import random, string
 import names
 import pytz
-from random import randrange
+from random import randrange ,randint
 from datetime import timedelta
 
 class Command(BaseCommand):
     help = "Save randomly generated user record values."
+
+    def random_number(self):
+        return random.randint(1, 5)
 
     def add_arguments(self, parser):
         # Positional arguments
@@ -38,7 +41,7 @@ class Command(BaseCommand):
         end = self.end_time()
         delta = end - start
         int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-        random_second = randrange(int_delta)
+        random_second = randrange(int_delta,22222222)
         return start + timedelta(seconds=random_second)
 
     def get_name(self):
@@ -61,12 +64,17 @@ class Command(BaseCommand):
                 "tz": self.get_timezone()
             }
             recordone = User(**kwargs)
-            gwargs = {
-                "user_id" : recordone,
-                "start_time": self.strt_time(),
-                "end_time" : self.random_date(),
-            }
-            recordtwo = ActivityPeriod(**gwargs)
             recordone.save()
-            recordtwo.save()
+            # gwargs = {
+            #     "user_id" : recordone,
+            #     "start_time": self.strt_time(),
+            #     "end_time" : self.random_date(),
+            # }
+            gwargs = []
+            for i in range(self.random_number()):
+                gwargs.append(ActivityPeriod(user_id = recordone,
+                    start_time= self.strt_time(),
+                    end_time = self.random_date()))
+            recordtwo = ActivityPeriod.objects.bulk_create(gwargs)
+            #recordtwo.save()
         self.stdout.write(self.style.SUCCESS('User records saved successfully.'))
